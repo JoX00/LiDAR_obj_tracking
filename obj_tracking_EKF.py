@@ -189,7 +189,7 @@ class bb_traking:
             'velocity': velocity
         }
     
-    def visualize_bounding_boxes(self, frames):
+    def run_algorithm(self, frames):
         vehicle_ids = {}  # Dictionary to keep track of active objects
         frame_results = []
 
@@ -419,7 +419,7 @@ true_frames = get_true_boxes(num_frames=100)
 start_time = time.time()
 config = yaml.safe_load(open("settings.yaml", 'r'))
 tracker = bb_traking(config)
-frame_results = tracker.visualize_bounding_boxes(true_frames)
+frame_results = tracker.run_algorithm(true_frames)
 add_difficulty_score(frame_results)
 
 # Convert results and save as JSON
