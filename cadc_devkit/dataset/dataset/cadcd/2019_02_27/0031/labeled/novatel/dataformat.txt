@@ -1,0 +1,20 @@
+Converted from Inertial Explorer output to match novatel INSPVAX message.
+http://docs.ros.org/api/novatel_msgs/html/msg/INSPVAX.html
+More information on page 148 of SPAN® on OEM6® Firmware Reference Manual
+https://www.novatel.com/assets/Documents/Manuals/OM-20000144UM.pdf
+
+latitude (degrees)
+longitude (degrees)
+altitude (m)
+undulation (m)
+latitude_std (m)
+longitude_std (m)
+altitude_std (m)
+roll (degrees)
+pitch (degrees)
+azimuth (degrees)
+roll_std (degrees)
+pitch_std (degrees)
+azimuth_std (degrees)
+ins_status
+position_type
