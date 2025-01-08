@@ -19,13 +19,13 @@ The input to the tracking system is a list of boundary boxes, each defined by 7 
   File name: object_traking_modified.py
 - **Tracking Algorithm**: An algorithm that track objects between frames of LiDAR data based on a weighted score that takes closest distance, velocity, and yaw into account. 
 - **Kalman Filter**: A Kalman filter is used to predict the next position and then compliment that prediction with measurements, making the algorithm more robust.
-- **Result**: HOTA score: 95.4, IDF1 score: 95.3. Result generated at 91fps with all true objects within 50m. 
+- **Result**: HOTA score: 95.4, IDF1 score: 95.3. Result generated at 91fps with all true objects within 50m. Visual result in output_KF.gif 
 
 ### 2. Object Tracking, EKF:
   File name: obj_tracking_EKF.py
 - **Tracking Algorithm**: Uses the same tracking algorithm as in object_traking_modified.py
 - **Extended Kalman Filter**: Uses an extended Kalman Filter CTRV model to update positions.
-- **Result**: HOTA score: 97.4, IDF1 score 97.3. Result generated at 89fps with all true objects within 50m. 
+- **Result**: HOTA score: 97.4, IDF1 score 97.3. Result generated at 89fps with all true objects within 50m. Visual result in output_EKF.gif 
   
 
 ### 3. Bird's Eye View Visualization:
