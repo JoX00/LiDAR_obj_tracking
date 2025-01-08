@@ -28,11 +28,11 @@ The input to the tracking system is a list of boundary boxes, each defined by 7 
 - **Result**: HOTA score: 97.4, IDF1 score 97.3. Result generated at 89fps with all true objects within 50m. 
   
 
-### 2. Bird's Eye View Visualization:
+### 3. Bird's Eye View Visualization:
   File name: cadc_devkit/run_demo_lidar_dev2.py
 - **BEV Video/GIF**: Generates a birds-eye view representation of the object tracking results, allowing for visual inspection.
 
-### 3. Quantitative Score:
+### 4. Quantitative Score:
   File name: evaluation.py
 - **HOTA and IDF1 scores**: Gerneates HOTA and IDF1 scores to evaluate the tracking result from the algorithms.
 
