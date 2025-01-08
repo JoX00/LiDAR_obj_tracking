@@ -26,7 +26,7 @@ The input to the tracking system is a list of boundary boxes, each defined by 7 
 ### 2. Object Tracking, EKF:
   File name: obj_tracking_EKF.py
 - **Tracking Algorithm**: Uses the same tracking algorithm as in object_traking_modified.py
-- **Extended Kalman Filter**: Uses an extended Kalman Filter CTRV model to update positions.
+- **Extended Kalman Filter**: Uses an extended Kalman Filter CTRV model to predict and update state.
 - **Result**: HOTA score: 97.4, IDF1 score 97.3. Result generated at 89fps with all true objects within 50m. Visual result in output_EKF.gif 
   
 
