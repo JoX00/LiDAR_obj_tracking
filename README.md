@@ -15,15 +15,26 @@ The input to the tracking system is a list of boundary boxes, each defined by 7 
 2. **Bird's Eye View (BEV) Visualization**: This tool generates a BEV video or GIF of the object tracking results using the LiDAR data.
 
 ## Key Features
-### 1. Object Tracking:
-  File name: object_tracking.py
-- **2D Space Tracking**: Tracks objects based on the closest distance in the X, Y 2D space. The `z` (height) is ignored for tracking.
-- **Kalman Filter**: A Kalman filter is used to predict the next position of a boundary box, enhancing tracking accuracy.
-- **Velocity Comparison**: Velocity comparison between consecutive frames is used to improve the object association and reduce ID switching errors.
+### 1. Object Tracking Kalman Filter:
+  File name: object_traking_modified.py
+- **Tracking Algorithm**: An algorithm that track objects between frames of LiDAR data based on a weighted score that takes closest distance, velocity, and yaw into account. 
+- **Kalman Filter**: A Kalman filter is used to predict the next position and then compliment that prediction with measurements, making the algorithm more robust.
+- **Result**: HOTA score: 95.4, IDF1 score: 95.3. Result generated at 91fps with all true objects within 50m. 
+
+### 2. Object Tracking, EKF:
+  File name: obj_tracking_EKF.py
+- **Tracking Algorithm**: Uses the same tracking algorithm as in object_traking_modified.py
+- **Extended Kalman Filter**: Uses an extended Kalman Filter CTRV model to update positions.
+- **Result**: HOTA score: 97.4, IDF1 score 97.3. Result generated at 89fps with all true objects within 50m. 
+  
 
 ### 2. Bird's Eye View Visualization:
   File name: cadc_devkit/run_demo_lidar_dev2.py
 - **BEV Video/GIF**: Generates a birds-eye view representation of the object tracking results, allowing for visual inspection.
+
+### 3. Quantitative Score:
+  File name: evaluation.py
+- **HOTA and IDF1 scores**: Gerneates HOTA and IDF1 scores to evaluate the tracking result from the algorithms.
 
 ## Installation
 
@@ -36,4 +47,4 @@ pip install re
 ```
 
 ### Sample Out:
-![GIF Visualization](output.gif)
+![GIF Visualization](output3.gif)
