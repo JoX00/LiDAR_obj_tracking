@@ -10,11 +10,10 @@ from collections import Counter
 
 class BoxTracker:
     def __init__(self, bbox_3d):
-        # Initialize Kalman Filter for tracking in 3D space (x, y, z positions and velocities)
         bbox_3d = np.array(bbox_3d)
         self.kf = KalmanFilter(dim_x=6, dim_z=3)
         
-        # Define state transition matrix for constant velocity model
+        #state transition matrix for constant velocity model
         dt = 1.0/10
         self.kf.F = np.array([[1, 0, 0, dt, 0, 0], 
                               [0, 1, 0, 0, dt, 0], 
@@ -22,32 +21,30 @@ class BoxTracker:
                               [0, 0, 0, 1, 0, 0], 
                               [0, 0, 0, 0, 1, 0], 
                               [0, 0, 0, 0, 0, 1]])
-        # Measurement matrix to map state space to measurement space
+        #measurement matrix to map state space to measurement space
         self.kf.H = np.array([[1, 0, 0, 0, 0, 0], 
                               [0, 1, 0, 0, 0, 0], 
                               [0, 0, 1, 0, 0, 0]])
 
-        # Set measurement noise, process noise, and initial covariance
+        #set measurement noise, process noise, and initial covariance
         self.kf.R = np.eye(3) * 0.1
         self.kf.Q = np.eye(6) * 0.1
-        self.kf.x[:3, 0] = bbox_3d[:3]  # Initial state position
-        self.kf.P = np.eye(6) * 10      # Initial state covariance
+        self.kf.x[:3, 0] = bbox_3d[:3]  #initial state position
+        self.kf.P = np.eye(6) * 10      #initial state covariance
 
     def predict(self):
-        # Predict the next state using Kalman Filter
         self.kf.predict()
 
     def update(self, bbox_3d):
-        # Update the state with new measurements
         self.kf.update(bbox_3d[:3])
 
     def get_state(self):
-        # Return the estimated position (x, y, z)
+        #return the estimated position (x, y, z)
         return self.kf.x[:3, 0]
 
 class bb_traking:
     def __init__(self, config):
-        # Load configuration parameters for tracking
+        #config parameters for tracking
         self.lidar_frequency = config['lidar_frequency']
         self.threshold = config['threshold']
         self.countdown = config['countdown']
@@ -56,7 +53,7 @@ class bb_traking:
         self.ignore_velocity = config['ignore_velocity']
 
     def create_rotation_matrix(self, yaw):
-        # Create a 3x3 rotation matrix for yaw angle
+        #3x3 rotation matrix for yaw angle
         cos_yaw = np.cos(yaw)
         sin_yaw = np.sin(yaw)
         return np.array([
@@ -66,26 +63,20 @@ class bb_traking:
         ])
     
     def calculate_distance(self, point1, point2):
-        # Calculate Euclidean distance between two points (x, y)
+        #Euclidean distance between two points (x, y)
         return math.sqrt((point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2)
     
     def calculate_velocity(self, P1, P2):
-        # Calculate velocity based on previous and current positions
-        t = 1 #/ self.lidar_frequency
+        #velocity based on previous and current positions
+        t = 1# / self.lidar_frequency
         return (np.array(P2[:2]) - np.array(P1[:2])) / t
     
-    def calculate_heading(self, P1, P2):
-        """calculate heading when object has travelled from point 1 to point 2"""
-        delta_y = P2[1] - P1[1]
-        delta_x = P2[0] - P1[0]
-        return np.arctan2(delta_y, delta_x)
-    
     def generate_traking_id(self, vehicle_ids, box, velocity):
-        # Assign a unique tracking ID and UUID for new objects
+        #unique tracking ID and UUID for new objects
         new_id = max(vehicle_ids.keys(), default=-1) + 1
         unique_uuid = str(uuid.uuid4())
         
-        # Initialize a new tracker for the detected box
+        #initialize a new tracker for the detected box
         tracker = BoxTracker(box)
         vehicle_ids[new_id] = {
             'uuid': unique_uuid, 
@@ -103,13 +94,13 @@ class bb_traking:
         return vehicle_ids, new_id
     
     def create_bb_box(self, box, uuid, stationary, velocity):
-        # Prepare bounding box data without Open3D for JSON output
+        #prepare bounding box data for JSON output
         center = np.array(box[:3])
         extent = np.array(box[3:6])
         yaw = box[6]
         rotation = self.create_rotation_matrix(yaw)
 
-        # Return dictionary of bounding box data
+        #return dictionary of bounding box data
         return {
             'uuid': uuid,
             'label': 'Car',
@@ -125,12 +116,12 @@ class bb_traking:
         }
     
     def run_algorithm(self, frames):
-        vehicle_ids = {}  # Dictionary to keep track of active objects
+        vehicle_ids = {}  #dict to keep track of active objects
         frame_results = []
 
         #iterate over frames
         for f, frame_boxes in enumerate(frames):
-            # Reset mapping count for all active objects
+            #reset mapping count for all active objects
             for key in vehicle_ids:
                 vehicle_ids[key]['mapped'] = 0
 
@@ -138,9 +129,9 @@ class bb_traking:
             new_tracks = []
             #iterate over boxes within a frame
             for box in frame_boxes:
-                center = np.array(box[:3])  # Current box position
+                center = np.array(box[:3])  #current box position
                 best_match_key = -1
-                existing_yaw = box[6]       # Current box yaw
+                existing_yaw = box[6]       #current box yaw
                 best_match_distance = float('inf')
                 best_match_tot_score = float('inf')
                 #ignore tracking for the first frame, 
@@ -150,7 +141,7 @@ class bb_traking:
                     for key, track in vehicle_ids.items():
                         distance_diff = self.calculate_distance(center, track['position'])
                         velocity_diff = np.linalg.norm(np.array(track['velocity']) - self.calculate_velocity(track['prev_position'], center))
-                        detected_yaw = track['box'][6]  # Extract yaw from the track
+                        detected_yaw = track['box'][6]  #extract yaw from the track
                         yaw_diff = abs(math.atan2(math.sin(detected_yaw - existing_yaw), math.cos(detected_yaw - existing_yaw)))
                         
                         #set scores   
@@ -169,29 +160,23 @@ class bb_traking:
                             best_match_key = key
                             best_match_tot_score = tot_score
                 
-                # If no match is found, append the box so a new track is created outside the objects loop
+                #if no match is found, append the box so a new track is created outside the objects loop
                 if best_match_key == -1:
                     new_tracks.append(box)
 
-                #only update the tracker if the best_match is not already taken or if it is taken and this is an even better match
-                elif ((vehicle_ids[best_match_key]['mapped'] == 0) or ((vehicle_ids[best_match_key]['mapped'] > 0)
-                     and (best_match_distance<vehicle_ids[best_match_key]['distance']))) :
-                    #calculate omega (turning rate) to be used in CTRV model
-                    omega = yaw_diff
-                    # Update the existing tracked object
+                #found a match
+                else:
+                    #update the existing tracked object
                     vehicle_ids[best_match_key]['mapped'] += 1
                     vehicle_ids[best_match_key]['box'] = box
                     previous_position = vehicle_ids[best_match_key]['position']
                     tracker = vehicle_ids[best_match_key]['tracker']
 
-                    #calculate heading (direction of movement) between prev_pos of match and position of the object we are matchin with
-                    heading = self.calculate_heading(vehicle_ids[best_match_key]['prev_position'], center)
-
-                    # Update and predict with Kalman filter
+                    #update and predict with Kalman filter
                     tracker.update(box)
                     tracker.predict()
 
-                    # Update position and calculate new velocity based on change in position
+                    #update position and calculate new velocity based on change in position
                     predicted_position = tracker.get_state().tolist()
                     new_velocity = self.calculate_velocity(previous_position, predicted_position)
 
@@ -212,7 +197,7 @@ class bb_traking:
                     #update the prev_position of track before updating 'position' with predicted position
                     vehicle_ids[best_match_key]['prev_position'] = vehicle_ids[best_match_key]['position']
 
-                    # Update tracking data with new position and velocity
+                    #update tracking data with new position and velocity
                     vehicle_ids[best_match_key]['position'] = predicted_position
                     vehicle_ids[best_match_key]['velocity'] = new_velocity
                     new_vel_scalar = np.linalg.norm(np.array(new_velocity)) 
@@ -221,11 +206,11 @@ class bb_traking:
                     else:
                         stationary = False
 
-                    # Create bounding box result
+                    # create bounding box result
                     bb_res = self.create_bb_box(box, vehicle_ids[best_match_key]['uuid'], stationary, new_vel_scalar)
                     box_results.append(bb_res)
                     
-            # Count down and remove untracked objects
+            #count down and remove untracked objects
             if f > 0:
                 for key in list(vehicle_ids.keys()):
                     if vehicle_ids[key]['mapped'] == 0:
@@ -242,7 +227,7 @@ class bb_traking:
                 bb_res = self.create_bb_box(track, vehicle_ids[new_id]['uuid'], stationary, velocity = 0)
                 box_results.append(bb_res)
 
-            # Append results for current frame
+            #append results for current frame
             frame_results.append({'cuboids': box_results})
 
         return frame_results
@@ -270,7 +255,7 @@ def convert_to_python_types(data):
         return data
     
 def print_fps(start_time, end_time):
-    elapsed_time = end_time - start_time  # Calculate elapsed time
+    elapsed_time = end_time - start_time  #calculate elapsed time
     fps = 100/elapsed_time
     print(f'fps = {fps}')
 
@@ -288,7 +273,7 @@ def get_true_boxes(num_frames):
     for frame in annotations_data[:num_frames]: #change here for loading different amount of frames
         obj_list = []
         for obj in frame['cuboids']:
-            # Create a row with position and dimensions
+            #create a row with position and dimensions
             one_obj_list = [
                 obj['position']['x'], 
                 obj['position']['y'], 
@@ -304,7 +289,7 @@ def get_true_boxes(num_frames):
     return(frame_list)
 
 def calculate_distance(self, point1, point2):
-        # Calculate Euclidean distance between two points (x, y)
+        #Euclidean distance between two points (x, y)
         return math.sqrt((point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2)
 
 def add_difficulty_score(frame_results):
@@ -357,10 +342,10 @@ tracker = bb_traking(config)
 frame_results = tracker.run_algorithm(true_frames)
 add_difficulty_score(frame_results)
 
-# Convert results and save as JSON
+#convert results and save as JSON
 converted_results = convert_to_python_types(frame_results)
 with open('3d_ann.json', 'w') as json_file:
     json.dump(converted_results, json_file, indent=4)
 
-end_time = time.time()  # Capture end time
+end_time = time.time()  #capture end time
 print_fps(start_time, end_time)
