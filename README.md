@@ -4,7 +4,7 @@
 
 The purpose was to perform and explore methods of object tracking in extreme weather conditions for the ROADVIEW project, this was done by further developing the existing tracking algorithm created by Gayan, for example by using an extended Kalman filter instead of a regular Kalman filter. 
 
-The object tracking has been performed on data from the CADC dataset. This project has not used the objects from Idriss’ object detection algorithm. Instead, the true boxes from the CADC dataset have been used, this data has an ID for objects in all 100 frames which has been used as a ground truth for evaluating the tracking quantitatively. Kalman Filtering and Extended Kalman filtering have been used for tracking. Results were visually assessed by plotting the object bounding boxes and quantitatively by calculating HOTA and IDF1 scores. 
+The object tracking has been performed on data from the CADC dataset. This project has not used the objects from Idriss’ object detection algorithm. Instead, the true boxes from the CADC dataset have been used, this data has an ID for objects in all 100 frames which has been used as a ground truth for evaluating the tracking quantitatively. Kalman Filtering and Extended Kalman filtering have been used for tracking. Results were visually assessed by plotting the object bounding boxes in gifs and quantitatively by calculating HOTA and IDF1 scores. 
 
 ### Input Format
 The input to the tracking system is a list of boundary boxes, each defined by 7 parameters:
