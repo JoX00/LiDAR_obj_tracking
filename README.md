@@ -49,4 +49,4 @@ pip install re
 ```
 
 ### Sample Out:
-![GIF Visualization](output3.gif)
+![GIF Visualization](output_EKF_true_boxes.gif)
