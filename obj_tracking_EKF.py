@@ -393,15 +393,15 @@ def add_difficulty_score(frame_results):
 ###### Main script to run tracking visualization
 
 # #load predicted boxe from Idriss
-# box_list = load_bounding_boxes("box_list.pkl")
+#boxes = load_bounding_boxes("box_list.pkl")
 
 #load true boxes from dataset, specify number of frames here, specify in get_true_boxes if you want all boxes or boxes inside 50m
-true_frames = get_true_boxes(num_frames=100) 
+boxes = get_true_boxes(num_frames=100) 
 
 start_time = time.time()
 config = yaml.safe_load(open("settings.yaml", 'r'))
 tracker = bb_traking(config)
-frame_results = tracker.run_algorithm(true_frames)
+frame_results = tracker.run_algorithm(boxes)
 add_difficulty_score(frame_results)
 
 # Convert results and save as JSON
